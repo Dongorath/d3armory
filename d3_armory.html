@@ -1,0 +1,239 @@
+<html>
+	<head>
+		<title>Diablo 3 Armory</title>
+		<link rel="stylesheet" type="text/css" href="d3_armory.css">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="d3_armory.js"></script>
+	</head>
+	<body>
+		Battle tag : <input type="text" id="btag" />
+		<input type="button" id="btn" onclick="GetProfile(); return false;" value="GO !" />
+		<table>
+			<tr>
+				<td id="leftPane">
+					<div id="lstHeroes">
+					</div>
+					<table id="tblHero">
+						<tr>
+							<td>Nom</td>
+							<td id="heroName"></td>
+						</tr>
+						<tr>
+							<td>Classe</td>
+							<td id="heroClass"></td>
+						</tr>
+						<tr>
+							<td>Niveau</td>
+							<td id="heroLevel"></td>
+						</tr>
+						<tr>
+							<td>Parangon</td>
+							<td id="heroParagon"></td>
+						</tr>
+						<tr>
+							<td>Saison</td>
+							<td id="heroSeason"></td>
+						</tr>
+						<tr>
+							<td>DPS</td>
+							<td id="heroDps"></td>
+						</tr>
+						<tr>
+							<td>Vitesse d&apos;attaque</td>
+							<td id="heroAS"></td>
+						</tr>
+						<tr>
+							<td>Chance critique</td>
+							<td id="heroCritChance"></td>
+						</tr>
+						<tr>
+							<td>Dommages critiques</td>
+							<td id="heroCritDamage"></td>
+						</tr>
+						<tr>
+							<td>Augmentation dommages</td>
+							<td id="heroDamageIncrease"></td>
+						</tr>
+						<tr>
+							<td>Armure</td>
+							<td id="heroArmor"></td>
+						</tr>
+						<tr>
+							<td>Vie</td>
+							<td id="heroLife"></td>
+						</tr>
+						<tr>
+							<td>Robustesse</td>
+							<td id="heroToughness"></td>
+						</tr>
+						<tr>
+							<td>Vie par seconde</td>
+							<td id="heroLifePerSec"></td>
+						</tr>
+						<tr>
+							<td>Vie par coup</td>
+							<td id="heroLifeOnHit"></td>
+						</tr>
+						<tr>
+							<td>Vie par meurtre</td>
+							<td id="heroLifeOnKill"></td>
+						</tr>
+						<tr>
+							<td>Leech</td>
+							<td id="heroLifeSteal"></td>
+						</tr>
+						<tr>
+							<td>Chances blocage</td>
+							<td id="heroBlockChance"></td>
+						</tr>
+						<tr>
+							<td>Blocage min</td>
+							<td id="heroBlockMin"></td>
+						</tr>
+						<tr>
+							<td>Blocage max</td>
+							<td id="heroBlockMax"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;duction dommages</td>
+							<td id="heroDamageReduc"></td>
+						</tr>
+						<tr>
+							<td>Force</td>
+							<td id="heroStrength"></td>
+						</tr>
+						<tr>
+							<td>Dext&eacute;rit&eacute;</td>
+							<td id="heroDex"></td>
+						</tr>
+						<tr>
+							<td>Vitalit&eacute;</td>
+							<td id="heroVitality"></td>
+						</tr>
+						<tr>
+							<td>Intelligence</td>
+							<td id="heroIntel"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance physique</td>
+							<td id="heroResistPhysical"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance feu</td>
+							<td id="heroResistFire"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance froid</td>
+							<td id="heroResistCold"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance &eacute;lectricit&eacute;</td>
+							<td id="heroResistLightning"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance poison</td>
+							<td id="heroResistPoison"></td>
+						</tr>
+						<tr>
+							<td>R&eacute;sistance arcane</td>
+							<td id="heroResistArcane"></td>
+						</tr>
+						<tr>
+							<td>&Eacute;pines</td>
+							<td id="heroThorns"></td>
+						</tr>
+						<tr>
+							<td>Or bonus</td>
+							<td id="heroGoldFind"></td>
+						</tr>
+						<tr>
+							<td>Magic find</td>
+							<td id="heroMagicFind"></td>
+						</tr>
+						<tr>
+							<td>Ressource primaire</td>
+							<td id="heroPrimRes"></td>
+						</tr>
+						<tr>
+							<td>Ressource secondaire</td>
+							<td id="heroSecRes"></td>
+						</tr>
+					</table>
+				</td>
+				<td id="leftPane">
+					<div id="divSeasons">
+						<table id="tblSeasons">
+							<tr id="trSeasonsHeader">
+								<th>Season</th>
+								<th>Parangon</th>
+								<th>Monstres tu&eacute;s</th>
+								<th>&Eacute;lites tu&eacute;s</th>
+								<th>Acte 1</th>
+								<th>Acte 2</th>
+								<th>Acte 3</th>
+								<th>Acte 4</th>
+								<th>Acte 5</th>
+							</tr>
+						</table>
+					</div>
+					<div id="divToon">
+						<table>
+							<tr>
+								<td>T&ecirc;te</td>
+								<td id="toonHead"></td>
+							</tr>
+							<tr>
+								<td>&Eacute;paules</td>
+								<td id="toonShoulder"></td>
+							</tr>
+							<tr>
+								<td>Amulette</td>
+								<td id="toonAmulet"></td>
+							</tr>
+							<tr>
+								<td>Torse</td>
+								<td id="toonTorso"></td>
+							</tr>
+							<tr>
+								<td>Gants</td>
+								<td id="toonHands"></td>
+							</tr>
+							<tr>
+								<td>Brassards</td>
+								<td id="toonBracers"></td>
+							</tr>
+							<tr>
+								<td>Ceinture</td>
+								<td id="toonWaist"></td>
+							</tr>
+							<tr>
+								<td>Anneau gauche</td>
+								<td id="toonRingLeft"></td>
+							</tr>
+							<tr>
+								<td>Anneau droit</td>
+								<td id="toonRingRight"></td>
+							</tr>
+							<tr>
+								<td>Jambes</td>
+								<td id="toonLegs"></td>
+							</tr>
+							<tr>
+								<td>Pieds</td>
+								<td id="toonFeet"></td>
+							</tr>
+							<tr>
+								<td>Arme</td>
+								<td id="toonWeapon"></td>
+							</tr>
+							<tr>
+								<td>Main gauche</td>
+								<td id="toonOffHand"></td>
+							</tr>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
