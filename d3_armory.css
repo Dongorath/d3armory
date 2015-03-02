@@ -1,0 +1,65 @@
+body {
+	background-color: #eee;
+}
+table {
+	border-collapse: collapse;
+}
+td, th {
+	border: 1px solid black;
+	padding: 3px;
+}
+li {
+	cursor: pointer;
+}
+#leftPane, #rightPane {
+	border: 0px;
+	vertical-align: top;
+}
+#lstHeroes, #tblHero, #divSeasons, #divToon {
+	display: none;
+}
+.lastHero {
+	font-weight: bold;
+}
+.barbarian {
+	color: red;
+}
+.demon-hunter {
+	color: purple;
+}
+.crusader {
+	color: gold;
+}
+.wizard {
+	color: blue;
+}
+.monk {
+	color: orange;
+}
+.witch-doctor {
+	color: darkgreen;
+}
+.nb {
+	text-align: right;
+}
+.center {
+	text-align: center;
+}
+.item_green {
+	color: #a4df44;
+}
+.item_orange {
+	color: #fba412;
+}
+.item_yellow {
+	color: #ffff00;
+}
+.item_blue {
+	color: #a0c3ff;
+}
+.item_white {
+	color: #fff;
+}
+.item_gray {
+	color: #c1c1c1;
+}
