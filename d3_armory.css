@@ -18,6 +18,9 @@ li {
 #lstHeroes, #tblHero, #divSeasons, #divToon {
 	display: none;
 }
+#tblHero td {
+	white-space:nowrap;
+}
 .lastHero {
 	font-weight: bold;
 }
