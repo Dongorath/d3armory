@@ -18,6 +18,9 @@ var GetData = function(heroId) {
 			var storedTooltip = localStorage.getItem(item.tooltipParams),
 				fillTooltip = function(itemJson) {
 					var ttText = td.html();
+					if (itemJson.attributesRaw.Ancient_Rank && itemJson.attributesRaw.Ancient_Rank.max > 0) {
+						ttText += '&nbsp(ancien)';
+					}
 					if (itemJson.isSeasonRequiredToDrop) {
 						ttText += '&nbsp;<img src="seasonal-leaf-small.png"/>';
 					}
