@@ -37,6 +37,9 @@ var GetData = function(heroId) {
 					for (var i = 0; i < itemJson.attributes.secondary.length; i++) {
 						ttText += '<br/>'+itemJson.attributes.secondary[i].text;
 					}
+					for (var i = 0; i < itemJson.attributes.passive.length; i++) {
+						ttText += '<br/>'+itemJson.attributes.passive[i].text;
+					}
 					for (var i = 0; i < itemJson.gems.length; i++) {
 						ttText += '<br/>'+itemJson.gems[i].item.name;
 						var first = true;
