@@ -12,6 +12,14 @@ var toPercent = function(val) {
 	return (Math.round(val * 10000) / 100) + ' %';
 };
 
+var affixCharacter = function(afType) {
+	switch (afType) {
+		case 'utility': return '&#x25c7;';
+		case 'enchant': return '&#x21bb;';
+		default: return '&#x25c6;';
+	}
+}
+
 var GetData = function(heroId) {
 	var battleTag = $('#btag').val(),
 		setItemTooltip = function(item, td) {
@@ -32,16 +40,16 @@ var GetData = function(heroId) {
 						ttText += ' ('+itemJson.minDamage.max.toLocaleString()+' - '+itemJson.maxDamage.max.toLocaleString()+' @ '+(Math.round(itemJson.attacksPerSecond.max*100)/100).toLocaleString()+' APS)';
 					}
 					for (var i = 0; i < itemJson.attributes.primary.length; i++) {
-						ttText += '<br/>'+itemJson.attributes.primary[i].text;
+						ttText += '<br/>'+affixCharacter(itemJson.attributes.primary[i].affixType)+'&nbsp;'+itemJson.attributes.primary[i].text;
 					}
 					for (var i = 0; i < itemJson.attributes.secondary.length; i++) {
-						ttText += '<br/>'+itemJson.attributes.secondary[i].text;
+						ttText += '<br/>'+affixCharacter(itemJson.attributes.secondary[i].affixType)+'&nbsp;'+itemJson.attributes.secondary[i].text;
 					}
 					for (var i = 0; i < itemJson.attributes.passive.length; i++) {
-						ttText += '<br/>'+itemJson.attributes.passive[i].text;
+						ttText += '<br/>'+affixCharacter(itemJson.attributes.passive[i].affixType)+'&nbsp;'+itemJson.attributes.passive[i].text;
 					}
 					for (var i = 0; i < itemJson.gems.length; i++) {
-						ttText += '<br/>'+itemJson.gems[i].item.name;
+						ttText += '<br/>&#x25c8;&nbsp;'+itemJson.gems[i].item.name;
 						var first = true;
 						for (var j = 0; j < itemJson.gems[i].attributes.primary.length; j++) {
 							if (first) {
