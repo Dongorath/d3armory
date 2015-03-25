@@ -50,6 +50,9 @@ var GetData = function(heroId) {
 					}
 					for (var i = 0; i < itemJson.gems.length; i++) {
 						ttText += '<br/>&#x25c8;&nbsp;'+itemJson.gems[i].item.name;
+						if (itemJson.gems[i].isJewel && itemJson.gems[i].jewelRank > 0) {
+							ttText += ' - Rang ' + itemJson.gems[i].jewelRank.toLocaleString();
+						}
 						var first = true;
 						for (var j = 0; j < itemJson.gems[i].attributes.primary.length; j++) {
 							if (first) {
