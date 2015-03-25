@@ -2,7 +2,7 @@ var apiKey = null;
 
 $(function() {
 	apiKey = localStorage.getItem('apiKey');
-	if (!apiKey) {
+	if (!apiKey || apiKey == "null") {
 		apiKey = prompt('Please enter API Key');
 		localStorage.setItem('apiKey', apiKey);
 	}
