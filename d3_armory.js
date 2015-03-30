@@ -22,9 +22,26 @@ var affixCharacter = function(afType) {
 
 var GetData = function(heroId) {
 	var battleTag = $('#btag').val(),
+		ajaxRequest = [],
 		setItemTooltip = function(item, td) {
 			var storedTooltip = localStorage.getItem(item.tooltipParams),
-				fillTooltip = function(itemJson) {
+				fillTooltip = function (itemJson) {
+					if (itemJson.set) {
+						var found = false;
+						for (var i = 0; i < listSets.length; i++) {
+							if (listSets[i].name == itemJson.set.name) {
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							listSets.push(itemJson.set);
+						}
+					}
+					if (itemJson.id === 'Unique_Ring_107_x1') {
+						rorg = true;
+					}
+					listItemId.push(itemJson.id);
 					var ttText = td.html();
 					if (itemJson.attributesRaw.Ancient_Rank && itemJson.attributesRaw.Ancient_Rank.max > 0) {
 						ttText += '&nbsp(ancien)';
@@ -90,7 +107,7 @@ var GetData = function(heroId) {
 			if (storedTooltip) {
 				fillTooltip(JSON.parse(storedTooltip));
 			} else {
-				$.ajax({
+				var a = $.ajax({
 					url : 'https://eu.api.battle.net/d3/data/'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
 					success: function(itemJson) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
@@ -98,8 +115,12 @@ var GetData = function(heroId) {
 					},
 					dataType: 'jsonp'
 				});
+				ajaxRequest.push(a);
 			}
 		},
+		listItemId = [],
+		listSets = [],
+		rorg = false,
 		fillTable = function(json) {
 			var cells = ['heroName', 'heroClass', 'heroLevel', 'heroParagon', 'heroSeason', 'heroDps', 'heroAS', 'heroCritChance', 'heroCritDamage', 'heroDamageIncrease', 'heroArmor',
 				'heroLife', 'heroToughness', 'heroLifePerSec', 'heroLifeOnHit', 'heroLifeOnKill', 'heroLifeSteal', 'heroBlockChance', 'heroBlockMin', 'heroBlockMax', 'heroDamageReduc',
@@ -155,6 +176,42 @@ var GetData = function(heroId) {
 				}
 			}
 			toon.css('display', 'block');
+			$.when.apply($, ajaxRequest).done(function () {
+				var sets = $('#divSets');
+				sets.html('');
+				var setsHtml = '';
+				for (var i = 0; i < listSets.length; i++) {
+					var nbItems = 0;
+					for (var j = 0; j < listSets[i].items.length; j++) {
+						if (listItemId.indexOf(listSets[i].items[j].id) >= 0) {
+							nbItems++;
+						}
+					}
+					if (i > 0) {
+						setsHtml += '<br/>';
+					}
+					setsHtml += '&#x2756;&nbsp;<span class="item_green">' + listSets[i].name + '</span>&nbsp;(' + nbItems.toLocaleString() + ')';
+					for (var j = 0; j < listSets[i].ranks.length; j++) {
+						var req = listSets[i].ranks[j].required;
+						if (rorg) {
+							req = Math.max(req - 1, 2);
+						}
+						if (nbItems >= req) {
+							for (var k = 0; k < listSets[i].ranks[j].attributes.primary.length; k++) {
+								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.primary[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.primary[k].text;
+							}
+							for (var k = 0; k < listSets[i].ranks[j].attributes.secondary.length; k++) {
+								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.secondary[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.secondary[k].text;
+							}
+							for (var k = 0; k < listSets[i].ranks[j].attributes.passive.length; k++) {
+								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.passive[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.passive[k].text;
+							}
+						}
+					}
+				}
+				sets.html(setsHtml);
+				sets.css('display', 'block');
+			})
 		},
 		storedHero;
 	if (!battleTag || !heroId) {
@@ -231,6 +288,7 @@ var GetProfile = function() {
 		jsonStoredProfile = null;
 	$('#tblHero').css('display', 'none');
 	$('#divToon').css('display', 'none');
+	$('#divSets').css('display', 'none');
 	if (storedProfile != null) {
 		jsonStoredProfile = JSON.parse(storedProfile);
 	}
