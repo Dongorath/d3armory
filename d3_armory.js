@@ -118,6 +118,43 @@ var GetData = function(heroId) {
 				ajaxRequest.push(a);
 			}
 		},
+		setLegendaryPowerTooltip = function(item, td) {
+			var storedTooltip = localStorage.getItem(item.tooltipParams),
+				fillTooltip = function (itemJson) {
+					var ttText = td.html();
+					if (itemJson.isSeasonRequiredToDrop) {
+						ttText += '&nbsp;<img src="seasonal-leaf-small.png"/>';
+					}
+					for (var i = 0; i < itemJson.attributes.primary.length; i++) {
+						if (itemJson.attributes.primary[i].color == 'orange') {
+							ttText += '<br/>'+affixCharacter(itemJson.attributes.primary[i].affixType)+'&nbsp;'+itemJson.attributes.primary[i].text;
+						}
+					}
+					for (var i = 0; i < itemJson.attributes.secondary.length; i++) {
+						if (itemJson.attributes.secondary[i].color == 'orange') {
+							ttText += '<br/>'+affixCharacter(itemJson.attributes.secondary[i].affixType)+'&nbsp;'+itemJson.attributes.secondary[i].text;
+						}
+					}
+					for (var i = 0; i < itemJson.attributes.passive.length; i++) {
+						if (itemJson.attributes.passive[i].color == 'orange') {
+							ttText += '<br/>'+affixCharacter(itemJson.attributes.passive[i].affixType)+'&nbsp;'+itemJson.attributes.passive[i].text;
+						}
+					}
+					td.html(ttText);
+				};
+			if (storedTooltip) {
+				fillTooltip(JSON.parse(storedTooltip));
+			} else {
+				$.ajax({
+					url : 'https://eu.api.battle.net/d3/data/'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
+					success: function(itemJson) {
+						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
+						fillTooltip(itemJson);
+					},
+					dataType: 'jsonp'
+				});
+			}
+		},
 		listItemId = [],
 		listSets = [],
 		rorg = false,
@@ -141,7 +178,8 @@ var GetData = function(heroId) {
 				['stats', 'thorns'], function(jsonData) { return toPercent(jsonData.stats.goldFind); }, function(jsonData) { return toPercent(jsonData.stats.magicFind); },
 				['stats', 'primaryResource'], ['stats', 'secondaryResource']],
 				toonLocations = {'toonHead': 'head', 'toonShoulder': 'shoulders', 'toonAmulet': 'neck', 'toonTorso': 'torso', 'toonHands': 'hands', 'toonBracers': 'bracers', 'toonWaist': 'waist',
-					'toonRingLeft': 'leftFinger', 'toonRingRight': 'rightFinger', 'toonLegs': 'legs', 'toonFeet': 'feet', 'toonWeapon': 'mainHand', 'toonOffHand': 'offHand'};
+					'toonRingLeft': 'leftFinger', 'toonRingRight': 'rightFinger', 'toonLegs': 'legs', 'toonFeet': 'feet', 'toonWeapon': 'mainHand', 'toonOffHand': 'offHand'},
+				legendaryPowers = ['toonLegendaryWeapon', 'toonLegendaryArmor', 'toonLegendaryJewel'];
 			localStorage.setItem(battleTag+'-'+heroId, JSON.stringify(json));
 			$('#tblHero').css('display', 'table');
 			for (var i = 0; i < cells.length; i++) {
@@ -173,6 +211,19 @@ var GetData = function(heroId) {
 				td.html('<span class="item_'+item.displayColor+'">'+item.name+'</span>');
 				if (item.tooltipParams.indexOf('item/') === 0) {
 					setItemTooltip(item, td);
+				}
+			}
+			for (var i = 0; i < legendaryPowers.length; i++) {
+				var td = $('#'+legendaryPowers[i]);
+				var item = json.legendaryPowers[i];
+				if (!item) {
+					td.removeAttr('class');
+					td.html('&#x2718;');
+					continue;
+				}
+				td.html('<span class="item_'+item.displayColor+'">'+item.name+'</span>');
+				if (item.tooltipParams.indexOf('item/') === 0) {
+					setLegendaryPowerTooltip(item, td);
 				}
 			}
 			toon.css('display', 'block');
