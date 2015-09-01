@@ -47,7 +47,7 @@ var GetData = function(heroId) {
 						ttText += '&nbsp(ancien)';
 					}
 					if (itemJson.isSeasonRequiredToDrop) {
-						ttText += '&nbsp;<img src="seasonal-leaf-small.png"/>';
+						ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
 					}
 					if (itemJson.armor && itemJson.armor.max > 0) {
 						ttText += '<br/>'+itemJson.armor.max.toLocaleString()+' armure';
@@ -123,7 +123,7 @@ var GetData = function(heroId) {
 				fillTooltip = function (itemJson) {
 					var ttText = td.html();
 					if (itemJson.isSeasonRequiredToDrop) {
-						ttText += '&nbsp;<img src="seasonal-leaf-small.png"/>';
+						ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
 					}
 					for (var i = 0; i < itemJson.attributes.primary.length; i++) {
 						if (itemJson.attributes.primary[i].color == 'orange') {
