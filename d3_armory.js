@@ -121,6 +121,9 @@ var GetData = function(heroId) {
 		setLegendaryPowerTooltip = function(item, td) {
 			var storedTooltip = localStorage.getItem(item.tooltipParams),
 				fillTooltip = function (itemJson) {
+					if (itemJson.id === 'P3_Unique_Ring_107') {
+						rorg = true;
+					}
 					var ttText = td.html();
 					if (itemJson.isSeasonRequiredToDrop) {
 						ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
@@ -145,7 +148,7 @@ var GetData = function(heroId) {
 			if (storedTooltip) {
 				fillTooltip(JSON.parse(storedTooltip));
 			} else {
-				$.ajax({
+				var a = $.ajax({
 					url : 'https://eu.api.battle.net/d3/data/'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
 					success: function(itemJson) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
@@ -153,6 +156,7 @@ var GetData = function(heroId) {
 					},
 					dataType: 'jsonp'
 				});
+				ajaxRequest.push(a);
 			}
 		},
 		listItemId = [],
