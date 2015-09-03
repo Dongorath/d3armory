@@ -266,7 +266,8 @@ var GetData = function(heroId) {
 				}
 				sets.html(setsHtml);
 				sets.css('display', 'block');
-			})
+				$('#imgLoad').hide();
+			});
 		},
 		storedHero;
 	if (!battleTag || !heroId) {
@@ -281,6 +282,7 @@ var GetData = function(heroId) {
 			success: fillTable,
 			dataType: 'jsonp'
 		});
+		$('#imgLoad').show();
 	}
 };
 
@@ -339,6 +341,7 @@ var GetProfile = function() {
 				lines += '</tr>';
 			}
 			$('#tblSeasons').append($(lines));
+			$('#imgLoad').hide();
 		},
 		jsonStoredProfile = null;
 	$('#tblHero').css('display', 'none');
@@ -352,4 +355,5 @@ var GetProfile = function() {
 		success: fillProfile,
 		dataType: 'jsonp'
 	});
+	$('#imgLoad').show();
 };
