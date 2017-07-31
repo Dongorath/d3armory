@@ -20,6 +20,23 @@ var affixCharacter = function(afType) {
 	}
 }
 
+var isError = function(json) {
+	if (json.code) {
+		var ulErrs = $('#ulErrors');
+		var ts = (new Date()).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+		var txt = json.code.toString();
+		if (json.reason) {
+			txt += ' - ' + json.reason;
+		} else {
+			txt += ' - ' + json.type + ' - ' + json.detail;
+		}
+		var liErr = $('<li></li>', { 'text': ts + ' - ' + txt });
+		ulErrs.append(liErr);
+		return true;
+	}
+	return false;
+}
+
 var GetData = function(heroId) {
 	var battleTag = $('#btag').val(),
 		ajaxRequest = [],
@@ -113,7 +130,8 @@ var GetData = function(heroId) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
 					},
-					dataType: 'jsonp'
+					dataType: 'jsonp',
+					jsonpCallback: 'mycallback'
 				});
 				ajaxRequest.push(a);
 			}
@@ -154,7 +172,8 @@ var GetData = function(heroId) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
 					},
-					dataType: 'jsonp'
+					dataType: 'jsonp',
+					jsonpCallback: 'mycallback'
 				});
 				ajaxRequest.push(a);
 			}
@@ -184,6 +203,10 @@ var GetData = function(heroId) {
 				toonLocations = {'toonHead': 'head', 'toonShoulder': 'shoulders', 'toonAmulet': 'neck', 'toonTorso': 'torso', 'toonHands': 'hands', 'toonBracers': 'bracers', 'toonWaist': 'waist',
 					'toonRingLeft': 'leftFinger', 'toonRingRight': 'rightFinger', 'toonLegs': 'legs', 'toonFeet': 'feet', 'toonWeapon': 'mainHand', 'toonOffHand': 'offHand'},
 				legendaryPowers = ['toonLegendaryWeapon', 'toonLegendaryArmor', 'toonLegendaryJewel'];
+			if (isError(json)) {
+				$('#imgLoad').hide();
+				return;
+			}
 			localStorage.setItem(battleTag+'-'+heroId, JSON.stringify(json));
 			$('#tblHero').css('display', 'table');
 			for (var i = 0; i < cells.length; i++) {
@@ -230,10 +253,10 @@ var GetData = function(heroId) {
 					setLegendaryPowerTooltip(item, td);
 				}
 			}
+			var sets = $('#divSets');
+			sets.html('');
 			toon.css('display', 'block');
 			$.when.apply($, ajaxRequest).done(function () {
-				var sets = $('#divSets');
-				sets.html('');
 				var setsHtml = '';
 				for (var i = 0; i < listSets.length; i++) {
 					var nbItems = 0;
@@ -280,7 +303,8 @@ var GetData = function(heroId) {
 		$.ajax({
 			url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/hero/'+heroId+'?locale=fr_FR&apikey='+apiKey,
 			success: fillTable,
-			dataType: 'jsonp'
+			dataType: 'jsonp',
+			jsonpCallback: 'mycallback'
 		});
 		$('#imgLoad').show();
 	}
@@ -290,6 +314,10 @@ var GetProfile = function() {
 	var battleTag = $('#btag').val(),
 		storedProfile = localStorage.getItem(battleTag),
 		fillProfile = function(json, status) {
+			if (isError(json)) {
+				$('#imgLoad').hide();
+				return;
+			}
 			var invalidateCache = false;
 			if (jsonStoredProfile) {
 				if (jsonStoredProfile.lastUpdated < json.lastUpdated) {
@@ -353,7 +381,10 @@ var GetProfile = function() {
 	$.ajax({
 		url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/?locale=fr_FR&apikey='+apiKey,
 		success: fillProfile,
-		dataType: 'jsonp'
+		dataType: 'jsonp',
+		jsonpCallback: 'mycallback'
 	});
 	$('#imgLoad').show();
 };
+
+var mycallback = function(j) { return j; };
