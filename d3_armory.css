@@ -11,7 +11,7 @@ td, th {
 li {
 	cursor: pointer;
 }
-#leftPane, #rightPane {
+#leftPane, #rightPane, #errorMessages {
 	border: 0px;
 	vertical-align: top;
 }
