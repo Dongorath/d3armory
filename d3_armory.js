@@ -355,18 +355,24 @@ var GetProfile = function() {
 			}
 			$('#tblSeasons > tbody > tr:not(#trSeasonsHeader)').remove();
 			var lines = '';
+			var seasons = [];
 			for (var s in json.seasonalProfiles) {
-				lines += '<tr>';
-				lines += '<td class="center">' + json.seasonalProfiles[s].seasonId + '</td>';
-				lines += '<td class="nb">' + json.seasonalProfiles[s].paragonLevel.toLocaleString() + '</td>';
-				lines += '<td class="nb">' + json.seasonalProfiles[s].kills.monsters.toLocaleString() + '</td>';
-				lines += '<td class="nb">' + json.seasonalProfiles[s].kills.elites.toLocaleString() + '</td>';
-				lines += '<td class="center">' + (json.seasonalProfiles[s].progression.act1 ? '&#x2714;' : '&#x2718;') + '</td>';
-				lines += '<td class="center">' + (json.seasonalProfiles[s].progression.act2 ? '&#x2714;' : '&#x2718;') + '</td>';
-				lines += '<td class="center">' + (json.seasonalProfiles[s].progression.act3 ? '&#x2714;' : '&#x2718;') + '</td>';
-				lines += '<td class="center">' + (json.seasonalProfiles[s].progression.act4 ? '&#x2714;' : '&#x2718;') + '</td>';
-				lines += '<td class="center">' + (json.seasonalProfiles[s].progression.act5 ? '&#x2714;' : '&#x2718;') + '</td>';
-				lines += '</tr>';
+				seasons[json.seasonalProfiles[s].seasonId] = json.seasonalProfiles[s];
+			}
+			for (var i=seasons.length - 1; i >= 0; i--) {
+				if (seasons[i]) {
+					lines += '<tr>';
+					lines += '<td class="center">' + seasons[i].seasonId + '</td>';
+					lines += '<td class="nb">' + seasons[i].paragonLevel.toLocaleString() + '</td>';
+					lines += '<td class="nb">' + seasons[i].kills.monsters.toLocaleString() + '</td>';
+					lines += '<td class="nb">' + seasons[i].kills.elites.toLocaleString() + '</td>';
+					lines += '<td class="center">' + (seasons[i].progression.act1 ? '&#x2714;' : '&#x2718;') + '</td>';
+					lines += '<td class="center">' + (seasons[i].progression.act2 ? '&#x2714;' : '&#x2718;') + '</td>';
+					lines += '<td class="center">' + (seasons[i].progression.act3 ? '&#x2714;' : '&#x2718;') + '</td>';
+					lines += '<td class="center">' + (seasons[i].progression.act4 ? '&#x2714;' : '&#x2718;') + '</td>';
+					lines += '<td class="center">' + (seasons[i].progression.act5 ? '&#x2714;' : '&#x2718;') + '</td>';
+					lines += '</tr>';
+				}
 			}
 			$('#tblSeasons').append($(lines));
 			$('#imgLoad').hide();
