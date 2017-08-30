@@ -18,6 +18,18 @@ var affixCharacter = function(afType) {
 		case 'enchant': return '&#x21bb;';
 		default: return '&#x25c6;';
 	}
+};
+
+var clearErrors = function() {
+	var ulErrs = $('#ulErrors');
+	ulErrs.empty();
+}
+
+var logError = function(msg) {
+	var ulErrs = $('#ulErrors');
+	var ts = (new Date()).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+	var liErr = $('<li></li>', { 'text': ts + ' - ' + msg });
+	ulErrs.append(liErr);
 }
 
 var isError = function(json) {
@@ -35,7 +47,7 @@ var isError = function(json) {
 		return true;
 	}
 	return false;
-}
+};
 
 var GetData = function(heroId) {
 	var battleTag = $('#btag').val(),
@@ -130,8 +142,10 @@ var GetData = function(heroId) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
 					},
-					dataType: 'jsonp',
-					jsonpCallback: 'mycallback'
+					error: function(jqXHR, textStatus, errorThrown) {
+						logError(textStatus + ' / ' + errorThrown);
+					},
+					timeout: 0
 				});
 				ajaxRequest.push(a);
 			}
@@ -172,8 +186,10 @@ var GetData = function(heroId) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
 					},
-					dataType: 'jsonp',
-					jsonpCallback: 'mycallback'
+					error: function(jqXHR, textStatus, errorThrown) {
+						logError(textStatus + ' / ' + errorThrown);
+					},
+					timeout: 0
 				});
 				ajaxRequest.push(a);
 			}
@@ -303,8 +319,10 @@ var GetData = function(heroId) {
 		$.ajax({
 			url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/hero/'+heroId+'?locale=fr_FR&apikey='+apiKey,
 			success: fillTable,
-			dataType: 'jsonp',
-			jsonpCallback: 'mycallback'
+			error: function(jqXHR, textStatus, errorThrown) {
+				logError(textStatus + ' / ' + errorThrown);
+			},
+			timeout: 0
 		});
 		$('#imgLoad').show();
 	}
@@ -387,10 +405,10 @@ var GetProfile = function() {
 	$.ajax({
 		url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/?locale=fr_FR&apikey='+apiKey,
 		success: fillProfile,
-		dataType: 'jsonp',
-		jsonpCallback: 'mycallback'
+		error: function(jqXHR, textStatus, errorThrown) {
+			logError(textStatus + ' / ' + errorThrown);
+		},
+		timeout: 0
 	});
 	$('#imgLoad').show();
 };
-
-var mycallback = function(j) { return j; };
