@@ -198,7 +198,7 @@ var GetData = function(heroId) {
 		listSets = [],
 		rorg = false,
 		fillTable = function(json) {
-			var cells = ['heroName', 'heroClass', 'heroLevel', 'heroParagon', 'heroSeason', 'heroDps', 'heroAS', 'heroCritChance', 'heroCritDamage', 'heroDamageIncrease', 'heroArmor',
+			var cells = ['heroName', 'heroClass', 'heroLevel', 'heroParagon', 'heroSeason', 'heroHardcore', 'heroDps', 'heroAS', 'heroCritChance', 'heroCritDamage', 'heroDamageIncrease', 'heroArmor',
 				'heroLife', 'heroToughness', 'heroLifePerSec', 'heroLifeOnHit', 'heroLifeOnKill', 'heroLifeSteal', 'heroBlockChance', 'heroBlockMin', 'heroBlockMax', 'heroDamageReduc',
 				'heroStrength', 'heroDex', 'heroVitality', 'heroIntel',
 				'heroResistPhysical', 'heroResistFire', 'heroResistCold', 'heroResistLightning', 'heroResistPoison', 'heroResistArcane',
@@ -209,6 +209,16 @@ var GetData = function(heroId) {
 					} else {
 						return 'N.A.';
 					}
+				}, function(jsonData) {
+					//seasons[i].progression.act1 ? '&#x2714;' : '&#x2718;'
+					if (jsonData.hardcore) {
+						if (jsonData.dead) {
+							return String.fromCharCode(9760);
+						} else {
+							return String.fromCharCode(10004);
+						}
+					}
+					return String.fromCharCode(10008);
 				}, ['stats', 'damage'], ['stats', 'attackSpeed'], function(jsonData) { return toPercent(jsonData.stats.critChance); }, function(jsonData) { return toPercent(jsonData.stats.critDamage); },
 				['stats', 'damageIncrease'], ['stats', 'armor'], ['stats', 'life'], ['stats', 'toughness'], ['stats', 'healing'], ['stats', 'lifeOnHit'], ['stats', 'lifePerKill'], ['stats', 'lifeSteal'],
 				function(jsonData) { return toPercent(jsonData.stats.blockChance); }, ['stats', 'blockAmountMin'], ['stats', 'blockAmountMax'], ['stats', 'damageReduction'],
