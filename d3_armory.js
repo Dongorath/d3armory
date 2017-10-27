@@ -372,8 +372,16 @@ var GetProfile = function() {
 				if (invalidateCache) {
 					localStorage.removeItem(battleTag+'-'+heroe.id);
 				}
+				var heroText = heroe.name+' <span class="hero_level';
+				if (heroe.hardcore) {
+					heroText += ' is_hardcore';
+				}
+				if (heroe.dead) {
+					heroText += ' is_dead';
+				}
+				heroText += '">'+heroe.level+' ('+heroe.paragonLevel+')</span>';
 				$('<li></li>', {
-					text : heroe.name+' '+heroe.level+' ('+heroe.paragonLevel+ (heroe.seasonCreated ? ('S' + heroe.seasonCreated) : '') + ')',
+					html : heroText,
 					'data-heroid': heroe.id,
 					click: function() {
 						GetData($(this).attr('data-heroid'));
