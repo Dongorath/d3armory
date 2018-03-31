@@ -52,7 +52,7 @@ li {
 	text-align: center;
 }
 .item_green {
-	color: #a4df44;
+	color: #0b8705;
 }
 .item_orange {
 	color: #fba412;
@@ -83,4 +83,29 @@ li {
 }
 .is_dead::before {
 	content: "\2620";
+}
+
+
+
+/******************/
+/** Blizzard CSS **/
+/******************/
+.tooltip-icon-bullet::before {
+	content: "\25c6";
+}
+.tooltip-icon-utility::before {
+	content: "\25c7";
+}
+.tooltip-icon-enchant::before {
+	content: "\21bb";
+}
+.d3-color-ffff8000::before {
+	content: "\25c6";
+}
+.d3-color-ff00ff00 {
+	color: #0b8705;
+}
+.d3-color-ff696969 {
+	color: #a0a0a0;
+	font-style: italic;
 }

@@ -75,7 +75,7 @@ var GetData = function(heroId) {
 					if (itemJson.attributesRaw.Ancient_Rank && itemJson.attributesRaw.Ancient_Rank.max > 0) {
 						ttText += '&nbsp(ancien)';
 					}
-					if (itemJson.isSeasonRequiredToDrop) {
+					if (itemJson.seasonRequiredToDrop > 0) {
 						ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
 					}
 					if (itemJson.armor && itemJson.armor.max > 0) {
@@ -137,7 +137,7 @@ var GetData = function(heroId) {
 				fillTooltip(JSON.parse(storedTooltip));
 			} else {
 				var a = $.ajax({
-					url : 'https://eu.api.battle.net/d3/data/'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
+					url : 'https://eu.api.battle.net/d3/data'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
 					success: function(itemJson) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
@@ -157,23 +157,12 @@ var GetData = function(heroId) {
 						rorg = true;
 					}
 					var ttText = td.html();
-					if (itemJson.isSeasonRequiredToDrop) {
+					if (itemJson.seasonRequiredToDrop > 0) {
 						ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
 					}
-					for (var i = 0; i < itemJson.attributes.primary.length; i++) {
-						if (itemJson.attributes.primary[i].color == 'orange') {
-							ttText += '<br/>'+affixCharacter(itemJson.attributes.primary[i].affixType)+'&nbsp;'+itemJson.attributes.primary[i].text;
-						}
-					}
-					for (var i = 0; i < itemJson.attributes.secondary.length; i++) {
-						if (itemJson.attributes.secondary[i].color == 'orange') {
-							ttText += '<br/>'+affixCharacter(itemJson.attributes.secondary[i].affixType)+'&nbsp;'+itemJson.attributes.secondary[i].text;
-						}
-					}
-					for (var i = 0; i < itemJson.attributes.passive.length; i++) {
-						if (itemJson.attributes.passive[i].color == 'orange') {
-							ttText += '<br/>'+affixCharacter(itemJson.attributes.passive[i].affixType)+'&nbsp;'+itemJson.attributes.passive[i].text;
-						}
+					// let's hope it's always the first secondary attribute, since we don't have the color info anymore...
+					if (itemJson.attributes.secondary.length > 0) {
+						ttText += '<br>'+itemJson.attributes.secondary[0].text;
 					}
 					td.html(ttText);
 				};
@@ -181,7 +170,7 @@ var GetData = function(heroId) {
 				fillTooltip(JSON.parse(storedTooltip));
 			} else {
 				var a = $.ajax({
-					url : 'https://eu.api.battle.net/d3/data/'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
+					url : 'https://eu.api.battle.net/d3/data'+item.tooltipParams+'?locale=fr_FR&apikey='+apiKey,
 					success: function(itemJson) {
 						localStorage.setItem(item.tooltipParams, JSON.stringify(itemJson));
 						fillTooltip(itemJson);
@@ -197,12 +186,12 @@ var GetData = function(heroId) {
 		listItemId = [],
 		listSets = [],
 		rorg = false,
-		fillTable = function(json) {
-			var cells = ['heroName', 'heroClass', 'heroLevel', 'heroParagon', 'heroSeason', 'heroHardcore', 'heroDps', 'heroAS', 'heroCritChance', 'heroCritDamage', 'heroDamageIncrease', 'heroArmor',
-				'heroLife', 'heroToughness', 'heroLifePerSec', 'heroLifeOnHit', 'heroLifeOnKill', 'heroLifeSteal', 'heroBlockChance', 'heroBlockMin', 'heroBlockMax', 'heroDamageReduc',
+		fillHeroTable = function(json) {
+			var cells = ['heroName', 'heroClass', 'heroLevel', 'heroParagon', 'heroSeason', 'heroHardcore', 'heroDps', 'heroAS', 'heroCritChance', 'heroArmor',
+				'heroLife', 'heroToughness', 'heroLifePerSec', 'heroLifeOnHit', 'heroLifeOnKill', 'heroLifeSteal', 'heroBlockChance', 'heroBlockMin', 'heroBlockMax',
 				'heroStrength', 'heroDex', 'heroVitality', 'heroIntel',
 				'heroResistPhysical', 'heroResistFire', 'heroResistCold', 'heroResistLightning', 'heroResistPoison', 'heroResistArcane',
-				'heroThorns', 'heroGoldFind', 'heroMagicFind', 'heroPrimRes', 'heroSecRes'],
+				'heroThorns', 'heroGoldFind', 'heroPrimRes', 'heroSecRes'],
 				dataLocation = ['name', 'class', 'level', 'paragonLevel', function(jsonData) {
 					if (jsonData.seasonCreated) {
 						return jsonData.seasonCreated;
@@ -210,25 +199,100 @@ var GetData = function(heroId) {
 						return 'N.A.';
 					}
 				}, function(jsonData) {
-					//seasons[i].progression.act1 ? '&#x2714;' : '&#x2718;'
 					if (jsonData.hardcore) {
-						if (jsonData.dead) {
+						if (!jsonData.alive) {
 							return String.fromCharCode(9760);
 						} else {
 							return String.fromCharCode(10004);
 						}
 					}
 					return String.fromCharCode(10008);
-				}, ['stats', 'damage'], ['stats', 'attackSpeed'], function(jsonData) { return toPercent(jsonData.stats.critChance); }, function(jsonData) { return toPercent(jsonData.stats.critDamage); },
-				['stats', 'damageIncrease'], ['stats', 'armor'], ['stats', 'life'], ['stats', 'toughness'], ['stats', 'healing'], ['stats', 'lifeOnHit'], ['stats', 'lifePerKill'], ['stats', 'lifeSteal'],
-				function(jsonData) { return toPercent(jsonData.stats.blockChance); }, ['stats', 'blockAmountMin'], ['stats', 'blockAmountMax'], ['stats', 'damageReduction'],
+				}, ['stats', 'damage'], ['stats', 'attackSpeed'], function(jsonData) { return toPercent(jsonData.stats.critChance || 0); },
+				['stats', 'armor'], ['stats', 'life'], ['stats', 'toughness'], ['stats', 'healing'], ['stats', 'lifeOnHit'], ['stats', 'lifePerKill'], ['stats', 'lifeSteal'],
+				function(jsonData) { return toPercent(jsonData.stats.blockChance || 0); }, ['stats', 'blockAmountMin'], ['stats', 'blockAmountMax'],
 				['stats', 'strength'], ['stats', 'dexterity'], ['stats', 'vitality'], ['stats', 'intelligence'],
 				['stats', 'physicalResist'], ['stats', 'fireResist'], ['stats', 'coldResist'], ['stats', 'lightningResist'], ['stats', 'poisonResist'], ['stats', 'arcaneResist'],
-				['stats', 'thorns'], function(jsonData) { return toPercent(jsonData.stats.goldFind); }, function(jsonData) { return toPercent(jsonData.stats.magicFind); },
+				['stats', 'thorns'], function(jsonData) { return toPercent(jsonData.stats.goldFind || 0); },
 				['stats', 'primaryResource'], ['stats', 'secondaryResource']],
 				toonLocations = {'toonHead': 'head', 'toonShoulder': 'shoulders', 'toonAmulet': 'neck', 'toonTorso': 'torso', 'toonHands': 'hands', 'toonBracers': 'bracers', 'toonWaist': 'waist',
 					'toonRingLeft': 'leftFinger', 'toonRingRight': 'rightFinger', 'toonLegs': 'legs', 'toonFeet': 'feet', 'toonWeapon': 'mainHand', 'toonOffHand': 'offHand'},
-				legendaryPowers = ['toonLegendaryWeapon', 'toonLegendaryArmor', 'toonLegendaryJewel'];
+				legendaryPowers = ['toonLegendaryWeapon', 'toonLegendaryArmor', 'toonLegendaryJewel'],
+				fillHeroItemsTable = function(itemsJson) {
+					var fillTooltip = function (itemJson, td) {
+						if (itemJson.set) {
+							var found = false;
+							for (var i = 0; i < listSets.length; i++) {
+								if (listSets[i].name == itemJson.set.name) {
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								listSets.push(itemJson.set);
+							}
+						}
+						if (itemJson.id === 'Unique_Ring_107_x1') {
+							rorg = true;
+						}
+						listItemId.push(itemJson.id);
+						var ttText = td.html();
+						// if (itemJson.attributesRaw.Ancient_Rank && itemJson.attributesRaw.Ancient_Rank.max > 0) {
+						// 	ttText += '&nbsp(ancien)';
+						// }
+						if (itemJson.isSeasonRequiredToDrop) {
+							ttText += '&nbsp;<div class="is_seasonal">&nbsp;</div>';
+						}
+						if (itemJson.armor > 0) {
+							ttText += '<br/>'+itemJson.armor.toLocaleString()+' armure';
+						}
+						if (itemJson.dps) {
+							ttText += '<br/>'+itemJson.dps+' DPS';
+							ttText += ' ('+itemJson.minDamage.toLocaleString()+' - '+itemJson.maxDamage.toLocaleString()+' @ '+(Math.round(itemJson.attacksPerSecond*100)/100).toLocaleString()+' APS)';
+						}
+						for (var i = 0; i < itemJson.attributesHtml.primary.length; i++) {
+							ttText += '<br/>'+itemJson.attributesHtml.primary[i];
+						}
+						for (var i = 0; i < itemJson.attributesHtml.secondary.length; i++) {
+							ttText += '<br/>'+itemJson.attributesHtml.secondary[i];
+						}
+						if (itemJson.gems) {
+							for (var i = 0; i < itemJson.gems.length; i++) {
+								if (itemJson.gems[i].isJewel) {
+									ttText += '<br/>&#x25c8;&nbsp;'+itemJson.gems[i].attributes[0].replace(/\n\n/g, '<br>');
+								} else {
+									ttText += '<br/>&#x25c8;&nbsp;'+itemJson.gems[i].item.name;
+									if (itemJson.gems[i].isJewel && itemJson.gems[i].jewelRank > 0) {
+										ttText += ' - Rang ' + itemJson.gems[i].jewelRank.toLocaleString();
+									}
+									var first = true;
+									for (var j = 0; j < itemJson.gems[i].attributes.length; j++) {
+										if (first) {
+											ttText += ' (';
+											first = false;
+										} else {
+											ttText += ' / ';
+										}
+										ttText += itemJson.gems[i].attributes[j];
+									}
+									if (!first) {
+										ttText += ')';
+									}
+								}
+							}
+						}
+						td.html(ttText);
+					};
+					localStorage.setItem(battleTag+'-'+heroId+'-items', JSON.stringify(itemsJson));
+					for (var c in toonLocations) {
+						var td = $('#'+c),
+							item = itemsJson[toonLocations[c]];
+						if (!item) {
+							continue;
+						}
+						fillTooltip(item, td);
+					}
+				},
+				storedHeroItems;
 			if (isError(json)) {
 				$('#imgLoad').hide();
 				return;
@@ -252,7 +316,9 @@ var GetData = function(heroId) {
 				}
 				$('#'+cells[i]).text(val);
 			}
+
 			var toon = $('#divToon');
+			// Init items with what we have in the main profile data...
 			for (var c in toonLocations) {
 				var td = $('#'+c);
 				var item = json.items[toonLocations[c]];
@@ -262,9 +328,21 @@ var GetData = function(heroId) {
 					continue;
 				}
 				td.html('<span class="item_'+item.displayColor+'">'+item.name+'</span>');
-				if (item.tooltipParams.indexOf('item/') === 0) {
-					setItemTooltip(item, td);
-				}
+			}
+			// ... and complete with detailed info from only 1 ajax call
+			storedHeroItems = localStorage.getItem(battleTag+'-'+heroId+'-items');
+			if (storedHeroItems) {
+				fillHeroItemsTable(JSON.parse(storedHeroItems));
+			} else {
+				var a = $.ajax({
+					url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/hero/'+heroId+'/items?locale=fr_FR&apikey='+apiKey,
+					success: fillHeroItemsTable,
+					error: function(jqXHR, textStatus, errorThrown) {
+						logError(textStatus + ' / ' + errorThrown);
+					},
+					timeout: 0
+				});
+				ajaxRequest.push(a);
 			}
 			for (var i = 0; i < legendaryPowers.length; i++) {
 				var td = $('#'+legendaryPowers[i]);
@@ -275,7 +353,7 @@ var GetData = function(heroId) {
 					continue;
 				}
 				td.html('<span class="item_'+item.displayColor+'">'+item.name+'</span>');
-				if (item.tooltipParams.indexOf('item/') === 0) {
+				if (item.tooltipParams.indexOf('/item/') === 0) {
 					setLegendaryPowerTooltip(item, td);
 				}
 			}
@@ -285,33 +363,10 @@ var GetData = function(heroId) {
 			$.when.apply($, ajaxRequest).done(function () {
 				var setsHtml = '';
 				for (var i = 0; i < listSets.length; i++) {
-					var nbItems = 0;
-					for (var j = 0; j < listSets[i].items.length; j++) {
-						if (listItemId.indexOf(listSets[i].items[j].id) >= 0) {
-							nbItems++;
-						}
-					}
 					if (i > 0) {
 						setsHtml += '<br/>';
 					}
-					setsHtml += '&#x2756;&nbsp;<span class="item_green">' + listSets[i].name + '</span>&nbsp;(' + nbItems.toLocaleString() + ')';
-					for (var j = 0; j < listSets[i].ranks.length; j++) {
-						var req = listSets[i].ranks[j].required;
-						if (rorg) {
-							req = Math.max(req - 1, 2);
-						}
-						if (nbItems >= req) {
-							for (var k = 0; k < listSets[i].ranks[j].attributes.primary.length; k++) {
-								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.primary[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.primary[k].text;
-							}
-							for (var k = 0; k < listSets[i].ranks[j].attributes.secondary.length; k++) {
-								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.secondary[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.secondary[k].text;
-							}
-							for (var k = 0; k < listSets[i].ranks[j].attributes.passive.length; k++) {
-								setsHtml += '<br/>&nbsp;&nbsp;&nbsp;&nbsp;' + affixCharacter(listSets[i].ranks[j].attributes.passive[k].affixType) + '&nbsp;' + listSets[i].ranks[j].attributes.passive[k].text;
-							}
-						}
-					}
+					setsHtml += '&#x2756;&nbsp;' + listSets[i].descriptionHtml;
 				}
 				sets.html(setsHtml);
 				sets.css('display', 'block');
@@ -323,12 +378,12 @@ var GetData = function(heroId) {
 		return;
 	}
 	storedHero = localStorage.getItem(battleTag+'-'+heroId);
-	if (storedHero != null) {
-		fillTable(JSON.parse(storedHero));
+	if (storedHero) {
+		fillHeroTable(JSON.parse(storedHero));
 	} else {
 		$.ajax({
 			url : 'https://eu.api.battle.net/d3/profile/'+battleTag+'/hero/'+heroId+'?locale=fr_FR&apikey='+apiKey,
-			success: fillTable,
+			success: fillHeroTable,
 			error: function(jqXHR, textStatus, errorThrown) {
 				logError(textStatus + ' / ' + errorThrown);
 			},
@@ -371,6 +426,7 @@ var GetProfile = function() {
 				var heroe = json.heroes[i];
 				if (invalidateCache) {
 					localStorage.removeItem(battleTag+'-'+heroe.id);
+					localStorage.removeItem(battleTag+'-'+heroe.id+'-items');
 				}
 				var heroText = heroe.name+' <span class="hero_level';
 				if (heroe.hardcore) {
@@ -387,7 +443,7 @@ var GetProfile = function() {
 						GetData($(this).attr('data-heroid'));
 						return false;
 					},
-					'class': heroe.class + (heroe.id == lastPlayed ? ' lastHero' : '')}).appendTo(heroe.seasonal ? ulSeason : ulNonSeason);
+					'class': heroe.classSlug + (heroe.id == lastPlayed ? ' lastHero' : '')}).appendTo(heroe.seasonal ? ulSeason : ulNonSeason);
 			}
 			$('#tblSeasons > tbody > tr:not(#trSeasonsHeader)').remove();
 			var lines = '';
@@ -402,11 +458,6 @@ var GetProfile = function() {
 					lines += '<td class="nb">' + seasons[i].paragonLevel.toLocaleString() + '</td>';
 					lines += '<td class="nb">' + seasons[i].kills.monsters.toLocaleString() + '</td>';
 					lines += '<td class="nb">' + seasons[i].kills.elites.toLocaleString() + '</td>';
-					lines += '<td class="center">' + (seasons[i].progression.act1 ? '&#x2714;' : '&#x2718;') + '</td>';
-					lines += '<td class="center">' + (seasons[i].progression.act2 ? '&#x2714;' : '&#x2718;') + '</td>';
-					lines += '<td class="center">' + (seasons[i].progression.act3 ? '&#x2714;' : '&#x2718;') + '</td>';
-					lines += '<td class="center">' + (seasons[i].progression.act4 ? '&#x2714;' : '&#x2718;') + '</td>';
-					lines += '<td class="center">' + (seasons[i].progression.act5 ? '&#x2714;' : '&#x2718;') + '</td>';
 					lines += '</tr>';
 				}
 			}
